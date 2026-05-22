@@ -1,0 +1,115 @@
+# =========================
+# Environment
+# =========================
+.env
+.env.local
+.env.*
+!.env.example
+
+# =========================
+# Go
+# =========================
+bin/
+dist/
+vendor/
+*.test
+*.out
+coverage.out
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.venv/
+venv/
+env/
+
+# =========================
+# UV
+# =========================
+.uv/
+uv.lock
+
+# =========================
+# IDE
+# =========================
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Reports & Generated Files
+# =========================
+reports/
+coverage/
+tmp/
+cache/
+
+# =========================
+# Runtime Artifacts
+# =========================
+*.pid
+*.seed
+
+# =========================
+# Test Artifacts
+# =========================
+*.prof
+*.coverprofile
+
+# =========================
+# Prometheus / Grafana
+# =========================
+prometheus-data/
+grafana-data/
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+
+# =========================
+# Locust
+# =========================
+.locust/
+
+# =========================
+# Cursor / AI tooling
+# =========================
+.cursor/
+.cursor-cache/
+
+# =========================
+# Build Outputs
+# =========================
+build/
+release/
+artifacts/
+
+# =========================
+# Benchmark Results
+# =========================
+benchmark-results/
+stress-results/
+
+# =========================
+# Temporary datasets
+# =========================
+datasets/tmp/
