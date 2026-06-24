@@ -1,0 +1,18 @@
+package entities
+
+// FailReason is benchmark-level (not HTTP FailureKind on Response).
+type FailReason string
+
+const (
+	FailReasonNone        FailReason = ""
+	FailReasonCallFailed  FailReason = "call_failed"  // timeout, 4xx/5xx, retry exhausted
+	FailReasonInvalidJSON FailReason = "invalid_json" // 2xx but body fails JSON syntax check
+)
+
+// CaseResult is the outcome of one benchmark case after ExecuteCase + optional checks.
+type CaseResult struct {
+	CaseID   string
+	Response Response
+	Passed   bool
+	Reason   FailReason
+}
