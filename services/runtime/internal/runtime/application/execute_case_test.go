@@ -11,10 +11,10 @@ import (
 )
 
 type fakeProvider struct {
-	mu       sync.Mutex
+	mu        sync.Mutex
 	responses []entities.Response
-	calls    int
-	sleep    time.Duration
+	calls     int
+	sleep     time.Duration
 }
 
 func (f *fakeProvider) Execute(ctx context.Context, req entities.Request) (entities.Response, error) {
