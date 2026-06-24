@@ -1,3 +1,7 @@
 package main
 
-func main() {}
+import "github.com/noodl-labs/ConnorLLM/services/runtime/internal/cli"
+
+func main() {
+	cli.Execute()
+}
