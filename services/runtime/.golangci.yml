@@ -1,0 +1,11 @@
+run:
+  timeout: 5m          # max 5 min pour analyser le projet
+
+linters:
+  enable:
+    - errcheck         # erreurs ignorées (if err != nil oublié)
+    - govet            # bugs suspects (go vet officiel)
+    - staticcheck      # analyse statique avancée
+    - unused           # code / variables inutilisés
+    - ineffassign      # assignations inutiles
+    - gosimple         # simplifications possibles
