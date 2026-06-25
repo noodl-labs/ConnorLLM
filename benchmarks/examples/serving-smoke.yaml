@@ -3,6 +3,7 @@ suite: serving-smoke
 defaults:
   timeout_ms: 30000
   retries: 2
+  expect_contains_ignore_case: true
 
 cases:
   - id: ping-gemini

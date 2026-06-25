@@ -4,9 +4,12 @@ import (
 	"github.com/noodl-labs/ConnorLLM/services/runtime/internal/runtime/domain/entities"
 )
 
-func failHint(reason entities.FailReason, resp entities.Response) string {
+func failHint(reason entities.FailReason, resp entities.Response, containsIgnoreCase bool) string {
 	switch reason {
 	case entities.FailReasonContentMismatch:
+		if containsIgnoreCase {
+			return "response does not include expected text (case-insensitive)"
+		}
 		return "response does not include expected text (case-sensitive)"
 	case entities.FailReasonInvalidJSON:
 		return "response is not valid JSON (markdown wrapper?)"

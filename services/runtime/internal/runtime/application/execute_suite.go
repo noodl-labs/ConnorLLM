@@ -37,7 +37,8 @@ func ExecuteSuite(
 			return entities.SuiteResult{}, err
 		}
 
-		exp := entities.ExpectationsFromCase(c.ExpectContains, c.ExpectJSON)
+		ignoreCase := resolveContainsIgnoreCase(c.ExpectContainsIgnoreCase, spec.Defaults.ExpectContainsIgnoreCase)
+		exp := entities.ExpectationsFromCase(c.ExpectContains, c.ExpectJSON, ignoreCase)
 		result, err := EvaluateCase(ctx, c.ID, exp, req, timeout, retry, executor)
 		if err != nil {
 			return entities.SuiteResult{}, err
@@ -57,6 +58,11 @@ func resolveSuiteTimeout(caseMS, defaultsMS int64) (reliability.TimeoutPolicy, e
 		return reliability.NewTimeoutPolicy(reliability.DefaultDeadline)
 	}
 	return reliability.NewTimeoutPolicyFromMS(ms)
+}
+
+// resolveContainsIgnoreCase merges per-case and suite defaults (OR: either may enable).
+func resolveContainsIgnoreCase(caseIgnore, defaultsIgnore bool) bool {
+	return caseIgnore || defaultsIgnore
 }
 
 // resolveSuiteRetries merges per-case and suite defaults; 0 everywhere uses defaultSuiteRetries.

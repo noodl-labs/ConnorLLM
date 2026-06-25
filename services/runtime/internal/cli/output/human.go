@@ -69,7 +69,7 @@ func printCaseDetail(w io.Writer, cv CaseView, verbose bool) {
 		if body := r.Response.BodyPreview(200); body != "" {
 			fmt.Fprintf(w, "   body:     %s\n", body)
 		}
-		if hint := failHint(r.Reason, r.Response); hint != "" {
+		if hint := failHint(r.Reason, r.Response, cv.ExpectContainsIgnoreCase); hint != "" {
 			fmt.Fprintf(w, "   hint:     %s\n", hint)
 		}
 		return

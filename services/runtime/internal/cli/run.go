@@ -77,7 +77,7 @@ func runSingleCase(model, prompt string, expectJSON bool, timeoutMS int64, retri
 	result, err := application.EvaluateCase(
 		context.Background(),
 		"cli-run",
-		entities.ExpectationsFromCase("", expectJSON),
+		entities.ExpectationsFromCase("", expectJSON, false),
 		req,
 		timeout,
 		retry,
@@ -124,11 +124,12 @@ func runSuite(path string, verbose bool) error {
 	cases := make([]output.CaseView, len(spec.Cases))
 	for i, c := range spec.Cases {
 		cases[i] = output.CaseView{
-			ID:             c.ID,
-			Model:          c.Model,
-			ExpectContains: c.ExpectContains,
-			ExpectJSON:     c.ExpectJSON,
-			Result:         suite.Results[i],
+			ID:                       c.ID,
+			Model:                    c.Model,
+			ExpectContains:           c.ExpectContains,
+			ExpectContainsIgnoreCase: c.ExpectContainsIgnoreCase || spec.Defaults.ExpectContainsIgnoreCase,
+			ExpectJSON:               c.ExpectJSON,
+			Result:                   suite.Results[i],
 		}
 	}
 

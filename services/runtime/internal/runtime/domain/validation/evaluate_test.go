@@ -23,6 +23,14 @@ func TestEvaluate_containsPass(t *testing.T) {
 	}
 }
 
+func TestEvaluate_containsIgnoreCasePass(t *testing.T) {
+	exp := entities.Expectations{Contains: "pong", ContainsIgnoreCase: true}
+	passed, reason := validation.Evaluate("Pong", exp)
+	if !passed || reason != entities.FailReasonNone {
+		t.Fatalf("passed=%v reason=%q", passed, reason)
+	}
+}
+
 func TestEvaluate_containsDisabled(t *testing.T) {
 	passed, reason := validation.Evaluate("anything", entities.Expectations{})
 	if !passed || reason != entities.FailReasonNone {
@@ -31,7 +39,13 @@ func TestEvaluate_containsDisabled(t *testing.T) {
 }
 
 func TestContains_caseSensitive(t *testing.T) {
-	if validation.Contains("Ping", "pong") {
+	if validation.Contains("Ping", "pong", false) {
 		t.Fatal("expected case-sensitive mismatch")
+	}
+}
+
+func TestContains_ignoreCase(t *testing.T) {
+	if !validation.Contains("Pong", "pong", true) {
+		t.Fatal("expected case-insensitive match")
 	}
 }
