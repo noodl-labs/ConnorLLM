@@ -138,3 +138,41 @@ func TestPrintRun_contentMismatchShowsDetail(t *testing.T) {
 		}
 	}
 }
+
+func TestPrintRun_schemaMismatchShowsDetail(t *testing.T) {
+	view := output.RunView{
+		Version: "v0.1.0-beta.1",
+		Target:  "https://openrouter.ai/api/v1",
+		SuiteID: "agent-json-gate",
+		Cases: []output.CaseView{
+			{
+				ID:               "wrong-shape",
+				Model:            "openai/gpt-4o-mini",
+				ExpectJSONSchema: true,
+				Result: entities.CaseResult{
+					CaseID:   "wrong-shape",
+					Passed:   false,
+					Reason:   entities.FailReasonSchemaMismatch,
+					Response: entities.NewSuccessResponse(`{"status":"ok"}`, 200, 400, 0, 1),
+				},
+			},
+		},
+	}
+
+	var buf bytes.Buffer
+	output.PrintRun(&buf, view, false)
+	got := buf.String()
+
+	for _, want := range []string{
+		"✗  wrong-shape",
+		"schema ✗",
+		"gate:     expect_json_schema",
+		"reason:   schema_mismatch",
+		"body:     {\"status\":\"ok\"}",
+		"hint:     response does not match JSON schema",
+	} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("output missing %q:\n%s", want, got)
+		}
+	}
+}

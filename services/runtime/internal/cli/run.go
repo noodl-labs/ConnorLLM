@@ -77,7 +77,7 @@ func runSingleCase(model, prompt string, expectJSON bool, timeoutMS int64, retri
 	result, err := application.EvaluateCase(
 		context.Background(),
 		"cli-run",
-		entities.ExpectationsFromCase("", expectJSON, false),
+		entities.ExpectationsFromCase("", expectJSON, false, nil),
 		req,
 		timeout,
 		retry,
@@ -129,6 +129,7 @@ func runSuite(path string, verbose bool) error {
 			ExpectContains:           c.ExpectContains,
 			ExpectContainsIgnoreCase: c.ExpectContainsIgnoreCase || spec.Defaults.ExpectContainsIgnoreCase,
 			ExpectJSON:               c.ExpectJSON,
+			ExpectJSONSchema:         c.ExpectJSONSchema.IsSet(),
 			Result:                   suite.Results[i],
 		}
 	}

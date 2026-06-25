@@ -5,8 +5,9 @@ type FailReason string
 
 const (
 	FailReasonNone            FailReason = ""
-	FailReasonCallFailed      FailReason = "call_failed"  // timeout, 4xx/5xx, retry exhausted
-	FailReasonInvalidJSON     FailReason = "invalid_json" // 2xx but body fails JSON syntax check
+	FailReasonCallFailed      FailReason = "call_failed"       // timeout, 4xx/5xx, retry exhausted
+	FailReasonInvalidJSON     FailReason = "invalid_json"      // 2xx but body fails JSON syntax check
+	FailReasonSchemaMismatch  FailReason = "schema_mismatch"   // 2xx JSON valid but fails expect_json_schema
 	FailReasonContentMismatch FailReason = "content_mismatch"
 )
 

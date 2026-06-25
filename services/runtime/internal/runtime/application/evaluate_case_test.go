@@ -33,7 +33,7 @@ func TestEvaluateCase_contentMismatch(t *testing.T) {
 	timeout, _ := reliability.NewTimeoutPolicy(time.Second)
 	retry, _ := reliability.NewRetryPolicy(2, 5*time.Millisecond)
 
-	exp := entities.ExpectationsFromCase("pong", false, false)
+	exp := entities.ExpectationsFromCase("pong", false, false, nil)
 	result, err := EvaluateCase(context.Background(), "ping-llama", exp, testRequest(t), timeout, retry, fake)
 	if err != nil {
 		t.Fatal(err)
@@ -58,7 +58,7 @@ func TestEvaluateCase_containsPass(t *testing.T) {
 	timeout, _ := reliability.NewTimeoutPolicy(time.Second)
 	retry, _ := reliability.NewRetryPolicy(2, 5*time.Millisecond)
 
-	exp := entities.ExpectationsFromCase("pong", false, false)
+	exp := entities.ExpectationsFromCase("pong", false, false, nil)
 	result, err := EvaluateCase(context.Background(), "ping-gemini", exp, testRequest(t), timeout, retry, fake)
 	if err != nil || !result.Passed {
 		t.Fatalf("result: %+v err=%v", result, err)
@@ -74,7 +74,7 @@ func TestEvaluateCase_containsIgnoreCasePass(t *testing.T) {
 	timeout, _ := reliability.NewTimeoutPolicy(time.Second)
 	retry, _ := reliability.NewRetryPolicy(2, 5*time.Millisecond)
 
-	exp := entities.ExpectationsFromCase("pong", false, true)
+	exp := entities.ExpectationsFromCase("pong", false, true, nil)
 	result, err := EvaluateCase(context.Background(), "ping-gemini", exp, testRequest(t), timeout, retry, fake)
 	if err != nil || !result.Passed {
 		t.Fatalf("result: %+v err=%v", result, err)

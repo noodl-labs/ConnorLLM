@@ -8,8 +8,11 @@ func Evaluate(body string, exp entities.Expectations) (bool, entities.FailReason
 	if exp.Contains != "" && !Contains(body, exp.Contains, exp.ContainsIgnoreCase) {
 		return false, entities.FailReasonContentMismatch
 	}
-	if exp.JSON && !Check(body) {
+	if exp.RequiresJSONSyntax() && !Check(body) {
 		return false, entities.FailReasonInvalidJSON
+	}
+	if len(exp.JSONSchema) > 0 && !CheckSchema(body, exp.JSONSchema) {
+		return false, entities.FailReasonSchemaMismatch
 	}
 	return true, entities.FailReasonNone
 }
