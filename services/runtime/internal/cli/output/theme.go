@@ -24,7 +24,7 @@ func NewTheme(w io.Writer) Theme {
 		pass:    lipgloss.NewStyle().Foreground(lipgloss.Color("2")).Bold(true), // vert
 		fail:    lipgloss.NewStyle().Foreground(lipgloss.Color("1")).Bold(true), // rouge
 		dim:     lipgloss.NewStyle().Foreground(lipgloss.Color("8")),            // gris
-		label:   lipgloss.NewStyle().Foreground(lipgloss.Color("12")),           // bleu labels
+		label:   lipgloss.NewStyle().Foreground(lipgloss.Color("6")),            // bleu labels
 		bold:    lipgloss.NewStyle().Bold(true),
 	}
 }
