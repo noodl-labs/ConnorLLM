@@ -88,6 +88,42 @@ func TestExecuteSuite_contentMismatch(t *testing.T) {
 	}
 }
 
+func TestExecuteSuite_containsIgnoreCaseFromDefaults(t *testing.T) {
+	fake := &fakeProvider{
+		responses: []entities.Response{
+			entities.NewSuccessResponse("Pong", 200, 10, 0, 1),
+		},
+	}
+
+	spec := benchmark.Spec{
+		Suite:    "test",
+		Defaults: benchmark.CaseDefaults{ExpectContainsIgnoreCase: true},
+		Cases: []benchmark.CaseSpec{
+			{ID: "ping-gemini", Model: "m", Prompt: "pong", ExpectContains: "pong"},
+		},
+	}
+
+	result, err := ExecuteSuite(context.Background(), spec, fake)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !result.AllPassed() {
+		t.Fatalf("result: %+v", result)
+	}
+}
+
+func TestResolveContainsIgnoreCase(t *testing.T) {
+	if !resolveContainsIgnoreCase(false, true) {
+		t.Fatal("expected defaults true")
+	}
+	if !resolveContainsIgnoreCase(true, false) {
+		t.Fatal("expected case true")
+	}
+	if resolveContainsIgnoreCase(false, false) {
+		t.Fatal("expected false")
+	}
+}
+
 func TestResolveSuiteTimeout_defaultDeadline(t *testing.T) {
 	timeout, err := resolveSuiteTimeout(0, 0)
 	if err != nil {

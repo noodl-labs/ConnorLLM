@@ -2,10 +2,17 @@ package validation
 
 import "strings"
 
-// Contains reports whether body includes want (case-sensitive, beta.2).
-func Contains(body, want string) bool {
+// Contains reports whether body includes want. When ignoreCase is false, match is case-sensitive.
+
+func Contains(body, want string, ignoreCase bool) bool {
 	if want == "" {
-		return true // gate disabled
+		return true
+	}
+	if ignoreCase {
+		return strings.Contains(
+			strings.ToLower(body),
+			strings.ToLower(want),
+		)
 	}
 	return strings.Contains(body, want)
 }
