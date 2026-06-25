@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+defaults:
+  run:
+    working-directory: services/runtime
+
+jobs:
+  test:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: services/runtime/go.mod
+          cache-dependency-path: services/runtime/go.sum
+
+      - name: Verify modules
+        run: go mod verify
+
+      - name: Run tests
+        run: go test -race -count=1 ./...
+
+      - name: Build binary
+        run: go build -o connor ./cmd/connor
+
+      - name: Smoke CLI (no network)
+        run: |
+          ./connor --help
+          ./connor run --help
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: services/runtime/go.mod
+          cache-dependency-path: services/runtime/go.sum
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: latest
+          working-directory: services/runtime
+          args: --timeout=5m

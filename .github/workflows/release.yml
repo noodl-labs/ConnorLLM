@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: services/runtime/go.mod
+          cache-dependency-path: services/runtime/go.sum
+
+      - name: Extract version from tag
+        id: version
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+
+      - name: Test
+        working-directory: services/runtime
+        run: go test -race -count=1 ./...
+
+      - name: Build binaries
+        working-directory: services/runtime
+        env:
+          VERSION: ${{ steps.version.outputs.tag }}
+        run: |
+          GOOS=linux   GOARCH=amd64 go build -ldflags "-X github.com/noodl-labs/ConnorLLM/services/runtime/internal/cli.Version=${VERSION}" -o dist/connor-linux-amd64   ./cmd/connor
+          GOOS=darwin  GOARCH=arm64 go build -ldflags "-X github.com/noodl-labs/ConnorLLM/services/runtime/internal/cli.Version=${VERSION}" -o dist/connor-darwin-arm64  ./cmd/connor
+          GOOS=darwin  GOARCH=amd64 go build -ldflags "-X github.com/noodl-labs/ConnorLLM/services/runtime/internal/cli.Version=${VERSION}" -o dist/connor-darwin-amd64  ./cmd/connor
+          GOOS=windows GOARCH=amd64 go build -ldflags "-X github.com/noodl-labs/ConnorLLM/services/runtime/internal/cli.Version=${VERSION}" -o dist/connor-windows-amd64.exe ./cmd/connor
+
+      - name: Attach assets to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: services/runtime/dist/*
+          generate_release_notes: true
