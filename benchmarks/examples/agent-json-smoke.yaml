@@ -1,0 +1,26 @@
+suite: agent-json-smoke
+
+defaults:
+  timeout_ms: 30000
+  retries: 2
+
+cases:
+  - id: flight-gpt4o-mini
+    model: openai/gpt-4o-mini
+    prompt: 'Return only raw JSON, no backticks: {"intent":"book_flight","confidence":0.9}'
+    expect_json_schema:
+      type: object
+      required: [intent, confidence]
+      properties:
+        intent: { type: string }
+        confidence: { type: number }
+
+  - id: flight-gemini
+    model: google/gemini-2.5-flash-lite
+    prompt: 'Return only raw JSON, no backticks: {"intent":"book_flight","confidence":0.9}'
+    expect_json_schema:
+      type: object
+      required: [intent, confidence]
+      properties:
+        intent: { type: string }
+        confidence: { type: number }
