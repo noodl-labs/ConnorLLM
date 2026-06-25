@@ -38,6 +38,11 @@ func NewClient(baseURL, apiKey string, httpClient *http.Client) (*Client, error)
 	}, nil
 }
 
+// Target returns the configured OpenAI-compatible base URL (includes /v1).
+func (c *Client) Target() string {
+	return c.BaseURL
+}
+
 // NewClientFromEnv uses CONNOR_BASE_URL and CONNOR_API_KEY.
 func NewClientFromEnv(httpClient *http.Client) (*Client, error) {
 	base := strings.TrimSpace(os.Getenv("CONNOR_BASE_URL"))

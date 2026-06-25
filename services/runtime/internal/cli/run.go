@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/noodl-labs/ConnorLLM/services/runtime/internal/benchmark"
+	"github.com/noodl-labs/ConnorLLM/services/runtime/internal/cli/output"
 	"github.com/noodl-labs/ConnorLLM/services/runtime/internal/runtime/application"
 	"github.com/noodl-labs/ConnorLLM/services/runtime/internal/runtime/domain/entities"
 	"github.com/noodl-labs/ConnorLLM/services/runtime/internal/runtime/domain/reliability"
@@ -22,6 +23,7 @@ func newRunCmd() *cobra.Command {
 		expectJSON bool
 		timeoutMS  int64
 		retries    int
+		verbose    bool
 	)
 
 	cmd := &cobra.Command{
@@ -30,9 +32,9 @@ func newRunCmd() *cobra.Command {
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 1 {
-				return runSuite(args[0])
+				return runSuite(args[0], verbose)
 			}
-			return runSingleCase(model, prompt, expectJSON, timeoutMS, retries)
+			return runSingleCase(model, prompt, expectJSON, timeoutMS, retries, verbose)
 		},
 	}
 
@@ -41,11 +43,12 @@ func newRunCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&expectJSON, "expect-json", false, "Require valid JSON in assistant content")
 	cmd.Flags().Int64Var(&timeoutMS, "timeout-ms", 30000, "Per-attempt timeout in ms")
 	cmd.Flags().IntVar(&retries, "retries", 2, "Max retries on transient errors")
+	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Show body and attempts on passed cases")
 
 	return cmd
 }
 
-func runSingleCase(model, prompt string, expectJSON bool, timeoutMS int64, retries int) error {
+func runSingleCase(model, prompt string, expectJSON bool, timeoutMS int64, retries int, verbose bool) error {
 	if model == "" || prompt == "" {
 		return fmt.Errorf("connor: --model and --prompt are required (or pass a .yaml suite file)")
 	}
@@ -84,11 +87,21 @@ func runSingleCase(model, prompt string, expectJSON bool, timeoutMS int64, retri
 		return err
 	}
 
-	printCaseResult(result)
-	return exitIfFailed(result.Passed, 1, 1)
+	view := output.RunView{
+		Version: Version,
+		Target:  client.Target(),
+		Cases: []output.CaseView{{
+			ID:         result.CaseID,
+			Model:      model,
+			ExpectJSON: expectJSON,
+			Result:     result,
+		}},
+	}
+	output.PrintRun(os.Stdout, view, verbose)
+	return exitIfFailed(result.Passed)
 }
 
-func runSuite(path string) error {
+func runSuite(path string, verbose bool) error {
 	if !isYAMLPath(path) {
 		return fmt.Errorf("connor: suite file must end with .yaml or .yml")
 	}
@@ -108,37 +121,30 @@ func runSuite(path string) error {
 		return err
 	}
 
-	fmt.Printf("suite:     %s\n", suite.SuiteID)
-	fmt.Printf("cases:     %d\n\n", len(suite.Results))
-
-	for _, result := range suite.Results {
-		printCaseResult(result)
-		fmt.Println()
+	cases := make([]output.CaseView, len(spec.Cases))
+	for i, c := range spec.Cases {
+		cases[i] = output.CaseView{
+			ID:         c.ID,
+			Model:      c.Model,
+			ExpectJSON: c.ExpectJSON,
+			Result:     suite.Results[i],
+		}
 	}
 
-	total := len(suite.Results)
-	passed := suite.PassedCount()
-	fmt.Printf("summary:   %d/%d passed\n", passed, total)
-
-	return exitIfFailed(suite.AllPassed(), passed, total)
+	view := output.RunView{
+		Version: Version,
+		Target:  client.Target(),
+		SuiteID: suite.SuiteID,
+		Cases:   cases,
+	}
+	output.PrintRun(os.Stdout, view, verbose)
+	return exitIfFailed(suite.AllPassed())
 }
 
-func printCaseResult(result entities.CaseResult) {
-	fmt.Printf("case_id:   %s\n", result.CaseID)
-	fmt.Printf("passed:    %v\n", result.Passed)
-	fmt.Printf("reason:    %s\n", result.Reason)
-	fmt.Printf("status:    %d\n", result.Response.HTTPStatus)
-	fmt.Printf("latency:   %dms\n", result.Response.LatencyMs)
-	fmt.Printf("attempts:  %d\n", result.Response.Attempts)
-	fmt.Printf("body:      %s\n", result.Response.BodyPreview(200))
-}
-
-func exitIfFailed(ok bool, _, _ int) error {
+func exitIfFailed(ok bool) error {
 	if ok {
-		fmt.Printf("exit:      0\n")
 		return nil
 	}
-	fmt.Printf("exit:      1\n")
 	os.Exit(1)
 	return nil
 }

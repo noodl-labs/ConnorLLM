@@ -1,0 +1,16 @@
+suite: agent-json-gate
+
+defaults:
+  timeout_ms: 30000
+  retries: 2
+
+cases:
+  - id: flight-intent
+    model: openai/gpt-4o-mini
+    prompt: 'Return only valid JSON, no markdown: {"intent":"book_flight","confidence":0.9}'
+    expect_json: true
+
+  - id: bad-json-should-fail
+    model: openai/gpt-4o-mini
+    prompt: "Explain JSON in plain English"
+    expect_json: true
