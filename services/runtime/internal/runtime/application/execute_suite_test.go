@@ -62,6 +62,32 @@ func TestExecuteSuite_oneFailContinues(t *testing.T) {
 	}
 }
 
+func TestExecuteSuite_contentMismatch(t *testing.T) {
+	fake := &fakeProvider{
+		responses: []entities.Response{
+			entities.NewSuccessResponse("Tabletennis", 200, 10, 0, 1),
+		},
+	}
+
+	spec := benchmark.Spec{
+		Suite: "test",
+		Cases: []benchmark.CaseSpec{
+			{ID: "ping-llama", Model: "m", Prompt: "pong", ExpectContains: "pong"},
+		},
+	}
+
+	result, err := ExecuteSuite(context.Background(), spec, fake)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.AllPassed() {
+		t.Fatalf("result: %+v", result)
+	}
+	if result.Results[0].Reason != entities.FailReasonContentMismatch {
+		t.Fatalf("reason=%q", result.Results[0].Reason)
+	}
+}
+
 func TestResolveSuiteTimeout_defaultDeadline(t *testing.T) {
 	timeout, err := resolveSuiteTimeout(0, 0)
 	if err != nil {

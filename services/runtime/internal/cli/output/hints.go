@@ -6,6 +6,8 @@ import (
 
 func failHint(reason entities.FailReason, resp entities.Response) string {
 	switch reason {
+	case entities.FailReasonContentMismatch:
+		return "response does not include expected text (case-sensitive)"
 	case entities.FailReasonInvalidJSON:
 		return "response is not valid JSON (markdown wrapper?)"
 	case entities.FailReasonCallFailed:

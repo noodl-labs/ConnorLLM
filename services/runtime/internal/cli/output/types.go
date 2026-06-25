@@ -3,10 +3,11 @@ package output
 import "github.com/noodl-labs/ConnorLLM/services/runtime/internal/runtime/domain/entities"
 
 type CaseView struct {
-	ID         string
-	Model      string
-	ExpectJSON bool
-	Result     entities.CaseResult
+	ID             string
+	Model          string
+	ExpectContains string
+	ExpectJSON     bool
+	Result         entities.CaseResult
 }
 
 type RunView struct {

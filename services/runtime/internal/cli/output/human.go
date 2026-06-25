@@ -3,6 +3,7 @@ package output
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/noodl-labs/ConnorLLM/services/runtime/internal/runtime/domain/entities"
 )
@@ -36,7 +37,7 @@ func printCaseLine(w io.Writer, cv CaseView) {
 		icon = "✓"
 	}
 
-	gates := gatesSuffix(cv.ExpectJSON, r.Passed, r.Reason)
+	gates := gatesSuffix(cv, r.Passed, r.Reason)
 	fmt.Fprintf(w, "%s  %-12s  %-*s  %4dms  HTTP %d%s\n",
 		icon,
 		cv.ID,
@@ -55,6 +56,10 @@ func printCaseDetail(w io.Writer, cv CaseView, verbose bool) {
 	}
 
 	if !r.Passed {
+		if cv.ExpectContains != "" {
+			fmt.Fprintln(w, "   gate:     expect_contains")
+			fmt.Fprintf(w, "   expected: %s\n", cv.ExpectContains)
+		}
 		if cv.ExpectJSON {
 			fmt.Fprintln(w, "   gate:     expect_json")
 		}
@@ -117,17 +122,28 @@ func summarize(view RunView) (passed, total int, totalMs int64, slowest CaseView
 	return passed, total, totalMs, slowest
 }
 
-func gatesSuffix(expectJSON, passed bool, reason entities.FailReason) string {
-	if !expectJSON {
+func gatesSuffix(cv CaseView, passed bool, reason entities.FailReason) string {
+	var parts []string
+	if cv.ExpectContains != "" {
+		parts = append(parts, gateLabel("contains", passed, reason, entities.FailReasonContentMismatch))
+	}
+	if cv.ExpectJSON {
+		parts = append(parts, gateLabel("json", passed, reason, entities.FailReasonInvalidJSON))
+	}
+	if len(parts) == 0 {
 		return ""
 	}
+	return "   " + strings.Join(parts, " ")
+}
+
+func gateLabel(name string, passed bool, reason, failReason entities.FailReason) string {
 	if passed {
-		return "   json ✓"
+		return name + " ✓"
 	}
-	if reason == entities.FailReasonInvalidJSON {
-		return "   json ✗"
+	if reason == failReason {
+		return name + " ✗"
 	}
-	return "   json"
+	return name
 }
 
 func truncate(s string, max int) string {
