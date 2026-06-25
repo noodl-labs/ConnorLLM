@@ -176,3 +176,25 @@ func TestPrintRun_schemaMismatchShowsDetail(t *testing.T) {
 		}
 	}
 }
+
+func TestPrintRun_noANSIWhenNotTTY(t *testing.T) {
+	view := output.RunView{
+		Version: "v0.1.0-beta.2",
+		Target:  "https://example.com/v1",
+		SuiteID: "test",
+		Cases: []output.CaseView{{
+			ID:    "ok",
+			Model: "m",
+			Result: entities.CaseResult{
+				Passed:   true,
+				Response: entities.NewSuccessResponse("ok", 200, 10, 0, 1),
+			},
+		}},
+	}
+
+	var buf bytes.Buffer
+	output.PrintRun(&buf, view, false)
+	if strings.Contains(buf.String(), "\x1b[") {
+		t.Fatalf("expected no ANSI escapes in buffer output:\n%s", buf.String())
+	}
+}
