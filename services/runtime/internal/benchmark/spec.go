@@ -12,10 +12,11 @@ type CaseDefaults struct {
 }
 
 type CaseSpec struct {
-	ID         string `yaml:"id"`
-	Model      string `yaml:"model"`
-	Prompt     string `yaml:"prompt"`
-	ExpectJSON bool   `yaml:"expect_json"`
-	TimeoutMS  int64  `yaml:"timeout_ms"`
-	Retries    int    `yaml:"retries"`
+	ID             string `yaml:"id"`
+	Model          string `yaml:"model"`
+	Prompt         string `yaml:"prompt"`
+	ExpectContains string `yaml:"expect_contains"`
+	ExpectJSON     bool   `yaml:"expect_json"`
+	TimeoutMS      int64  `yaml:"timeout_ms"`
+	Retries        int    `yaml:"retries"`
 }

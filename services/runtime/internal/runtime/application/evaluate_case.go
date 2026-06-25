@@ -9,14 +9,15 @@ import (
 	"github.com/noodl-labs/ConnorLLM/services/runtime/internal/runtime/domain/validation"
 )
 
-// EvaluateCase runs one benchmark case: provider call (ExecuteCase) then optional JSON check (L1).
+// EvaluateCase runs one benchmark case: ExecuteCase then validation gates.
 //
-// expectJSON false: Passed iff Response.Succeeded().
-// expectJSON true:  Passed iff Succeeded() and validation.Check(Response.Body).
+// Gates (via Expectations): expect_contains, expect_json.
+// HTTP failure → Passed=false, Reason=call_failed.
+// HTTP 2xx → validation.Evaluate applies active gates.
 func EvaluateCase(
 	ctx context.Context,
 	caseID string,
-	expectJSON bool,
+	exp entities.Expectations,
 	req entities.Request,
 	timeout reliability.TimeoutPolicy,
 	retry reliability.RetryPolicy,
@@ -38,17 +39,8 @@ func EvaluateCase(
 		return result, nil
 	}
 
-	if !expectJSON {
-		result.Passed = true
-		result.Reason = entities.FailReasonNone
-		return result, nil
-	}
-
-	if validation.Check(resp.Body) {
-		result.Passed = true
-		result.Reason = entities.FailReasonNone
-	} else {
-		result.Reason = entities.FailReasonInvalidJSON
-	}
+	passed, reason := validation.Evaluate(resp.Body, exp)
+	result.Passed = passed
+	result.Reason = reason
 	return result, nil
 }

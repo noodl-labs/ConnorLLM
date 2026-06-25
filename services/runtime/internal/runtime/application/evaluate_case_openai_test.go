@@ -30,7 +30,7 @@ func TestEvaluateCase_withOpenAIClient_invalidJSON(t *testing.T) {
 		{Role: "user", Content: "json"},
 	}, false)
 
-	result, err := EvaluateCase(context.Background(), "json-case", true, req, timeout, retry, client)
+	result, err := EvaluateCase(context.Background(), "json-case", entities.Expectations{JSON: true}, req, timeout, retry, client)
 	if err != nil {
 		t.Fatal(err)
 	}

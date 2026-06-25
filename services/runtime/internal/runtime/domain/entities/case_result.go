@@ -4,9 +4,10 @@ package entities
 type FailReason string
 
 const (
-	FailReasonNone        FailReason = ""
-	FailReasonCallFailed  FailReason = "call_failed"  // timeout, 4xx/5xx, retry exhausted
-	FailReasonInvalidJSON FailReason = "invalid_json" // 2xx but body fails JSON syntax check
+	FailReasonNone            FailReason = ""
+	FailReasonCallFailed      FailReason = "call_failed"  // timeout, 4xx/5xx, retry exhausted
+	FailReasonInvalidJSON     FailReason = "invalid_json" // 2xx but body fails JSON syntax check
+	FailReasonContentMismatch FailReason = "content_mismatch"
 )
 
 // CaseResult is the outcome of one benchmark case after ExecuteCase + optional checks.

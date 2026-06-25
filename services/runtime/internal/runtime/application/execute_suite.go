@@ -37,7 +37,8 @@ func ExecuteSuite(
 			return entities.SuiteResult{}, err
 		}
 
-		result, err := EvaluateCase(ctx, c.ID, c.ExpectJSON, req, timeout, retry, executor)
+		exp := entities.ExpectationsFromCase(c.ExpectContains, c.ExpectJSON)
+		result, err := EvaluateCase(ctx, c.ID, exp, req, timeout, retry, executor)
 		if err != nil {
 			return entities.SuiteResult{}, err
 		}
