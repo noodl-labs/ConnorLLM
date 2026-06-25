@@ -124,6 +124,70 @@ func TestResolveContainsIgnoreCase(t *testing.T) {
 	}
 }
 
+func TestExecuteSuite_schemaMismatch(t *testing.T) {
+	schema := benchmark.JSONSchemaDocument(`{
+		"type":"object",
+		"required":["intent"],
+		"properties":{"intent":{"type":"string"}}
+	}`)
+
+	fake := &fakeProvider{
+		responses: []entities.Response{
+			entities.NewSuccessResponse(`{"status":"ok"}`, 200, 10, 0, 1),
+		},
+	}
+
+	spec := benchmark.Spec{
+		Suite: "test",
+		Cases: []benchmark.CaseSpec{
+			{ID: "flight", Model: "m", Prompt: "json", ExpectJSONSchema: schema},
+		},
+	}
+
+	result, err := ExecuteSuite(context.Background(), spec, fake)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.AllPassed() {
+		t.Fatalf("result: %+v", result)
+	}
+	if result.Results[0].Reason != entities.FailReasonSchemaMismatch {
+		t.Fatalf("reason=%q", result.Results[0].Reason)
+	}
+}
+
+func TestExecuteSuite_schemaPass(t *testing.T) {
+	schema := benchmark.JSONSchemaDocument(`{
+		"type":"object",
+		"required":["intent","confidence"],
+		"properties":{
+			"intent":{"type":"string"},
+			"confidence":{"type":"number"}
+		}
+	}`)
+
+	fake := &fakeProvider{
+		responses: []entities.Response{
+			entities.NewSuccessResponse(`{"intent":"book_flight","confidence":0.9}`, 200, 10, 0, 1),
+		},
+	}
+
+	spec := benchmark.Spec{
+		Suite: "test",
+		Cases: []benchmark.CaseSpec{
+			{ID: "flight", Model: "m", Prompt: "json", ExpectJSONSchema: schema},
+		},
+	}
+
+	result, err := ExecuteSuite(context.Background(), spec, fake)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !result.AllPassed() {
+		t.Fatalf("result: %+v", result)
+	}
+}
+
 func TestResolveSuiteTimeout_defaultDeadline(t *testing.T) {
 	timeout, err := resolveSuiteTimeout(0, 0)
 	if err != nil {

@@ -38,7 +38,7 @@ func ExecuteSuite(
 		}
 
 		ignoreCase := resolveContainsIgnoreCase(c.ExpectContainsIgnoreCase, spec.Defaults.ExpectContainsIgnoreCase)
-		exp := entities.ExpectationsFromCase(c.ExpectContains, c.ExpectJSON, ignoreCase)
+		exp := entities.ExpectationsFromCase(c.ExpectContains, c.ExpectJSON, ignoreCase, c.ExpectJSONSchema.Raw())
 		result, err := EvaluateCase(ctx, c.ID, exp, req, timeout, retry, executor)
 		if err != nil {
 			return entities.SuiteResult{}, err

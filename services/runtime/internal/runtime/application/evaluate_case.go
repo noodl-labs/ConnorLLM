@@ -11,7 +11,7 @@ import (
 
 // EvaluateCase runs one benchmark case: ExecuteCase then validation gates.
 //
-// Gates (via Expectations): expect_contains, expect_json.
+// Gates (via Expectations): expect_contains, expect_json, expect_json_schema.
 // HTTP failure → Passed=false, Reason=call_failed.
 // HTTP 2xx → validation.Evaluate applies active gates.
 func EvaluateCase(

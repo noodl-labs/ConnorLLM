@@ -8,7 +8,21 @@ cases:
   - id: flight-intent
     model: openai/gpt-4o-mini
     prompt: 'Return only valid JSON, no markdown: {"intent":"book_flight","confidence":0.9}'
-    expect_json: true
+    expect_json_schema:
+      type: object
+      required: [intent, confidence]
+      properties:
+        intent: { type: string }
+        confidence: { type: number }
+
+  - id: wrong-shape-should-fail
+    model: openai/gpt-4o-mini
+    prompt: 'Return only valid JSON, no markdown: {"status":"ok"}'
+    expect_json_schema:
+      type: object
+      required: [intent]
+      properties:
+        intent: { type: string }
 
   - id: bad-json-should-fail
     model: openai/gpt-4o-mini

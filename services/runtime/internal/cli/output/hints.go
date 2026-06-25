@@ -13,6 +13,8 @@ func failHint(reason entities.FailReason, resp entities.Response, containsIgnore
 		return "response does not include expected text (case-sensitive)"
 	case entities.FailReasonInvalidJSON:
 		return "response is not valid JSON (markdown wrapper?)"
+	case entities.FailReasonSchemaMismatch:
+		return "response does not match JSON schema"
 	case entities.FailReasonCallFailed:
 		if resp.IsTimeout() {
 			return "increase timeout_ms or check endpoint latency"

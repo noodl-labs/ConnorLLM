@@ -1,9 +1,11 @@
 package benchmark
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
+	"github.com/noodl-labs/ConnorLLM/services/runtime/internal/runtime/domain/validation"
 	"gopkg.in/yaml.v3"
 )
 
@@ -54,12 +56,29 @@ func validate(spec Spec) error {
 		if c.Retries < 0 {
 			return fmt.Errorf("benchmark: case %q: retries must be >= 0", c.ID)
 		}
+		if err := validateJSONSchema(c.ID, c.ExpectJSONSchema); err != nil {
+			return err
+		}
 	}
 	if spec.Defaults.TimeoutMS < 0 {
 		return fmt.Errorf("benchmark: defaults.timeout_ms must be >= 0")
 	}
 	if spec.Defaults.Retries < 0 {
 		return fmt.Errorf("benchmark: defaults.retries must be >= 0")
+	}
+	return nil
+}
+
+func validateJSONSchema(caseID string, schema JSONSchemaDocument) error {
+	if !schema.IsSet() {
+		return nil
+	}
+	raw := schema.Raw()
+	if !json.Valid(raw) {
+		return fmt.Errorf("benchmark: case %q: expect_json_schema must be valid JSON", caseID)
+	}
+	if _, err := validation.CompileSchema(raw); err != nil {
+		return fmt.Errorf("benchmark: case %q: expect_json_schema: %w", caseID, err)
 	}
 	return nil
 }

@@ -8,6 +8,7 @@ type CaseView struct {
 	ExpectContains           string
 	ExpectContainsIgnoreCase bool
 	ExpectJSON               bool
+	ExpectJSONSchema         bool
 	Result                   entities.CaseResult
 }
 

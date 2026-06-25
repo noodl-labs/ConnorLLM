@@ -60,7 +60,9 @@ func printCaseDetail(w io.Writer, cv CaseView, verbose bool) {
 			fmt.Fprintln(w, "   gate:     expect_contains")
 			fmt.Fprintf(w, "   expected: %s\n", cv.ExpectContains)
 		}
-		if cv.ExpectJSON {
+		if cv.ExpectJSONSchema {
+			fmt.Fprintln(w, "   gate:     expect_json_schema")
+		} else if cv.ExpectJSON {
 			fmt.Fprintln(w, "   gate:     expect_json")
 		}
 		if r.Reason != "" {
@@ -127,7 +129,9 @@ func gatesSuffix(cv CaseView, passed bool, reason entities.FailReason) string {
 	if cv.ExpectContains != "" {
 		parts = append(parts, gateLabel("contains", passed, reason, entities.FailReasonContentMismatch))
 	}
-	if cv.ExpectJSON {
+	if cv.ExpectJSONSchema {
+		parts = append(parts, schemaGateLabel(passed, reason))
+	} else if cv.ExpectJSON {
 		parts = append(parts, gateLabel("json", passed, reason, entities.FailReasonInvalidJSON))
 	}
 	if len(parts) == 0 {
@@ -144,6 +148,16 @@ func gateLabel(name string, passed bool, reason, failReason entities.FailReason)
 		return name + " ✗"
 	}
 	return name
+}
+
+func schemaGateLabel(passed bool, reason entities.FailReason) string {
+	if passed {
+		return "schema ✓"
+	}
+	if reason == entities.FailReasonSchemaMismatch || reason == entities.FailReasonInvalidJSON {
+		return "schema ✗"
+	}
+	return "schema"
 }
 
 func truncate(s string, max int) string {
