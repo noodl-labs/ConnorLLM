@@ -2,8 +2,8 @@
 
 > **The CI/CD reliability toolkit for AI systems** — quality gates before merge.
 
-**Current release:** [v0.1.0-beta.2](CHANGELOG.md#v010-beta2)  
-**Status:** Beta — serving smoke + agent output gates in CI.
+**Current release:** [v0.1.0-beta.3](CHANGELOG.md#v010-beta3)  
+**Status:** Beta — serving smoke, agent output gates, p95 regression compare.
 
 ---
 
@@ -21,7 +21,8 @@ Block merges when LLM/agent runtime regresses — availability, structured outpu
 |---------|-------|----------|
 | **v0.1.0-beta.1** ✅ | Serving smoke | "Does my endpoint respond?" |
 | **v0.1.0-beta.2** ✅ | Agent output gates | "Does output match the contract?" |
-| **v0.1.0** 🔜 | Regression compare | "Did we regress vs baseline?" |
+| **v0.1.0-beta.3** ✅ | Regression compare (p95) | "Did p95 regress vs baseline?" |
+| **v0.1.0** 🔜 | Pass-rate gate + handbook | Full v0.1 regression gates |
 | **v0.2.0** 📋 | Tool calls + cost | "Did the agent call the right tool?" |
 | **v1.0.0** 📋 | Full agent CI | Workflows, replay, semantic eval (Python) |
 
@@ -48,7 +49,7 @@ Dates are indicative — ship when **exit criteria** below are met.
 | 11 | Exact content | "pong" not "Tabletennis"? | ✅ beta.2 | `expect_contains` |
 | 12 | JSON Schema | Required fields present? | ✅ beta.2 | `expect_json_schema` |
 | | **Regression & budget** | | | |
-| 13 | Latency regression | p95 vs baseline? | 🔜 v0.1 | `connor compare` |
+| 13 | Latency regression | p95 vs baseline? | ✅ beta.3 | `connor compare` |
 | 14 | Pass rate | Success rate ≥ threshold? | 🔜 v0.1 | `min_pass_rate` |
 | 15 | Token cost | API budget exceeded? | 📋 v0.2 | `max_cost_regression` |
 | | **Agent & tools** | | | |
@@ -105,14 +106,14 @@ Dates are indicative — ship when **exit criteria** below are met.
 **Theme:** Regression testing & budget gates
 
 ### Benchmark Engine
-- [ ] Export `run.json` after suite run
-- [ ] `connor compare baseline.json candidate.json`
-- [ ] Suite summary: p50 / p95 latency
+- [x] Export `run.json` after suite run
+- [x] `connor compare baseline.json candidate.json`
+- [x] Suite summary: p50 / p95 latency
 
 ### Quality Gates
-- [ ] `max_p95_regression` threshold
+- [x] `max_p95_regression` threshold
 - [ ] `min_pass_rate` threshold
-- [ ] `connor compare` exits 1 on gate failure
+- [x] `connor compare` exits 1 on gate failure
 
 ### Developer Experience
 - [x] README + architecture + `.env.example`
@@ -120,8 +121,10 @@ Dates are indicative — ship when **exit criteria** below are met.
 - [ ] LICENSE
 
 ### Exit criteria for v0.1.0
-- [ ] `connor run suite.yaml --out run.json` works
-- [ ] `connor compare` blocks on latency regression in demo
+- [x] `connor run suite.yaml --out run.json` works
+- [x] `connor compare` blocks on latency regression in demo
+- [ ] `connor compare` respects `--min-pass-rate`
+- [ ] Documented in handbook
 - [ ] Tag `v0.1.0` published
 
 ---
@@ -172,7 +175,7 @@ Details: [docs/architecture.md](docs/architecture.md)
 
 | # | Feature | Status | Release |
 |---|---------|--------|---------|
-| 1 | Regression testing | Suite yes, compare no | v0.1 |
+| 1 | Regression testing | compare p95 shipped | beta.3 ✅ / v0.1 🔜 |
 | 2 | Tool call verification | — | v0.2 |
 | 3 | Reliability score | — | v1 |
 | 4 | Budget guard | Latency display only | v0.1 / v0.2 |

@@ -57,7 +57,7 @@ connor run benchmarks/examples/serving-smoke.yaml
 ## Example output
 
 ```text
-Connor  v0.1.0-beta.2
+Connor  v0.1.0-beta.3
 Target  https://openrouter.ai/api/v1
 Suite   agent-json-smoke (2 cases)
 
@@ -124,8 +124,8 @@ Connor is built as six engines:
 
 ## Status
 
-**Current:** `v0.1.0-beta.2` — smoke, JSON schema, contains, CI exit codes  
-**Next (v0.1.0):** `run.json`, `connor compare`, latency / pass-rate gates
+**Current:** `v0.1.0-beta.3` — smoke, JSON schema, `run.json` export, `connor compare` (p95)  
+**Next (v0.1.0):** `--min-pass-rate`, CI handbook
 
 ## License
 

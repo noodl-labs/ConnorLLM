@@ -1,0 +1,46 @@
+suite: glm-qwen-smoke
+
+defaults:
+  timeout_ms: 60000
+  retries: 2
+
+cases:
+  - id: intent-glm
+    model: z-ai/glm-5.2
+    prompt: 'Return only raw JSON, no backticks: {"intent":"book_flight","confidence":0.9}'
+    expect_json_schema:
+      type: object
+      required: [intent, confidence]
+      properties:
+        intent: { type: string }
+        confidence: { type: number }
+
+  - id: intent-qwen
+    model: qwen/qwen3.7-plus
+    prompt: 'Return only raw JSON, no backticks: {"intent":"book_flight","confidence":0.9}'
+    expect_json_schema:
+      type: object
+      required: [intent, confidence]
+      properties:
+        intent: { type: string }
+        confidence: { type: number }
+
+  - id: intent-laguna
+    model: poolside/laguna-m.1
+    prompt: 'Return only raw JSON, no backticks: {"intent":"book_flight","confidence":0.9}'
+    expect_json_schema:
+      type: object
+      required: [intent, confidence]
+      properties:
+        intent: { type: string }
+        confidence: { type: number }
+
+  - id: intent-mistral
+    model: mistralai/mistral-small-2603
+    prompt: 'Return only raw JSON, no backticks: {"intent":"book_flight","confidence":0.9}'
+    expect_json_schema:
+      type: object
+      required: [intent, confidence]
+      properties:
+        intent: { type: string }
+        confidence: { type: number }
