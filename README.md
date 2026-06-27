@@ -1,4 +1,4 @@
-# ConnorLLM
+# Connor
 
 > **The CI/CD reliability toolkit for AI systems.**
 
