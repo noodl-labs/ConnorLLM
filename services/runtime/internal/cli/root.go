@@ -12,6 +12,7 @@ func NewRoot() *cobra.Command {
 		Short: "ConnorLLM — LLM runtime reliability benchmarks",
 	}
 	root.AddCommand(newRunCmd())
+	root.AddCommand(newCompareCmd())
 	return root
 }
 

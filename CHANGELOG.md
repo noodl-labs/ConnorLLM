@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.1.0-beta.3
+
+**Theme:** Regression compare (p95).
+
+### Added
+- `connor run suite.yaml --out run.json` — export run artifact (RFC 0001)
+- `connor compare baseline.json candidate.json --max-p95-regression N` — p95 regression gate
+- Compare FAIL output shows p95 driver case (id, model, latency delta)
+
+### Note
+- `--min-pass-rate` on compare is planned for v0.1.0 (not in this release)
+
+---
+
 ## v0.1.0-beta.2
 
 **Theme:** Agent output gates — text and JSON Schema.
