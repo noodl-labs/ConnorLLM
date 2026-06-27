@@ -23,7 +23,8 @@ func newRunCmd() *cobra.Command {
 		expectJSON bool
 		timeoutMS  int64
 		retries    int
-		verbose    bool
+		verbose bool
+		outPath string
 	)
 
 	cmd := &cobra.Command{
@@ -32,7 +33,7 @@ func newRunCmd() *cobra.Command {
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 1 {
-				return runSuite(args[0], verbose)
+				return runSuite(args[0], outPath, verbose)
 			}
 			return runSingleCase(model, prompt, expectJSON, timeoutMS, retries, verbose)
 		},
@@ -44,6 +45,7 @@ func newRunCmd() *cobra.Command {
 	cmd.Flags().Int64Var(&timeoutMS, "timeout-ms", 30000, "Per-attempt timeout in ms")
 	cmd.Flags().IntVar(&retries, "retries", 2, "Max retries on transient errors")
 	cmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Show body and attempts on passed cases")
+	cmd.Flags().StringVar(&outPath, "out", "", "Write run.json artifact (suite mode only)")
 
 	return cmd
 }
@@ -101,7 +103,7 @@ func runSingleCase(model, prompt string, expectJSON bool, timeoutMS int64, retri
 	return exitIfFailed(result.Passed)
 }
 
-func runSuite(path string, verbose bool) error {
+func runSuite(path string, outPath string, verbose bool) error {
 	if !isYAMLPath(path) {
 		return fmt.Errorf("connor: suite file must end with .yaml or .yml")
 	}
@@ -119,6 +121,25 @@ func runSuite(path string, verbose bool) error {
 	suite, err := application.ExecuteSuite(context.Background(), spec, client)
 	if err != nil {
 		return err
+	}
+
+	if outPath != "" {
+		metas := make([]entities.RunCaseMeta, len(spec.Cases))
+		for i, c := range spec.Cases {
+			metas[i] = entities.RunCaseMeta{ID: c.ID, Model: c.Model}
+		}
+		artifact, err := entities.BuildRunArtifact(
+			suite.SuiteID,
+			client.Target(),
+			metas,
+			suite.Results,
+		)
+		if err != nil {
+			return fmt.Errorf("connor: build run artifact: %w", err)
+		}
+		if err := writeRunArtifact(outPath, artifact); err != nil {
+			return err
+		}
 	}
 
 	cases := make([]output.CaseView, len(spec.Cases))
