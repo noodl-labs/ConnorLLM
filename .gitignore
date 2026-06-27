@@ -113,3 +113,6 @@ stress-results/
 # Temporary datasets
 # =========================
 datasets/tmp/
+
+docs/adr/
+docs/rfc/
