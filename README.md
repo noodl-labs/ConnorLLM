@@ -136,7 +136,11 @@ connor compare runs/baseline.json runs/candidate.json --max-p95-regression 20
 # PASS or FAIL  p95 +N%  (threshold: 20%)
 # On FAIL: driver case id, model, and latency delta are shown
 ```
+- exit 0: compare passed
+- exit 1: latency regression failed
+- exit 2: invalid or incomparable run files
 
+On failure, Connor shows the driver case, model, and latency delta.
 Baseline = your last known-good run (e.g. artifact from `main`). Candidate = current PR run.
 
 ---
